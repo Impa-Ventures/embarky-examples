@@ -7,6 +7,7 @@ import {
   Text,
   VStack,
   useMediaQuery,
+  useToast,
 } from '@chakra-ui/react'
 import { useAccount, useDisconnect, useSignMessage } from 'wagmi'
 import { useEmbarky } from '@embarky/react'
@@ -47,6 +48,7 @@ export default function Dashboard() {
   const [signStatus, setSignStatus] = useState(SIGN_STATUS.INIT)
   const [hoverWallet, setHoverWallet] = useState('')
   const { disconnectAsync } = useDisconnect()
+  const toast = useToast()
 
   const [isLargerThan900] = useMediaQuery('(min-width: 900px)')
 
@@ -71,9 +73,18 @@ export default function Dashboard() {
 
   const unlinkWalletDisable = userAccount?.wallets?.length === 1
 
-  const onGoogle = () => {
+  // jacky: add try catch to handle unlink google error
+  const onGoogle = async () => {
     if (googleObj) {
-      unlinkGoogle(googleObj.social_subject)
+      try {
+        const res = await unlinkGoogle(googleObj.social_subject)
+      } catch (e) {
+        toast({
+          title: JSON.parse(e?.message)?.data,
+          status: 'error',
+          position: 'top',
+        })
+      }
     } else {
       linkGoogle()
     }
