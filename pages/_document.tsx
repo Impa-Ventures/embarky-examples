@@ -7,7 +7,8 @@ export default function Document() {
     <Html lang="en">
       <Head />
       <body>
-        <ColorModeScript initialColorMode={embarkyConfig.theme as any} />
+        {/* @ts-ignore */}
+        <ColorModeScript initialColorMode={embarkyConfig.theme} />
         <Main />
         <NextScript />
       </body>
