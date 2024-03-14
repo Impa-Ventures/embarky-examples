@@ -12,20 +12,21 @@ import {
   ModalCloseButton,
   ModalOverlay,
 } from '@chakra-ui/react'
-import { useEmbarky } from '@embarky/react'
+import { useEmbarky, getSignMessage } from '@embarky/react'
 
 export default function SignMessageModal({ onClose, onSuccess, onFailed }) {
   const { userAccount, getEmbeddedWallet } = useEmbarky()
 
   const walletObj = userAccount?.wallets?.find(
-    (item) => item.wallet_client === 'impa'
+    (item) => item.wallet_client === 'embarky'
   )
 
   const signMessage = async () => {
     try {
       const wallet = await getEmbeddedWallet()
+      const message = await getSignMessage(walletObj.wallet_address)
       const res = await wallet.signMessage({
-        message: 'impa_ventures',
+        message,
       })
       console.log('signMessage:res---', res)
       onSuccess()

@@ -10,7 +10,7 @@ import {
   useToast,
 } from '@chakra-ui/react'
 import { useAccount, useDisconnect, useSignMessage } from 'wagmi'
-import { useEmbarky } from '@embarky/react'
+import { useEmbarky, getSignMessage } from '@embarky/react'
 import Image from '@/components/Image'
 import { formatAddress } from '@/utils'
 import googleImg from '@/images/social/google.svg'
@@ -52,22 +52,20 @@ export default function Dashboard() {
 
   const [isLargerThan900] = useMediaQuery('(min-width: 900px)')
 
-  const { isLoading: isSigning, signMessageAsync } = useSignMessage({
-    message: 'impa_ventures',
-  })
+  const { isLoading: isSigning, signMessageAsync } = useSignMessage()
 
   const googleObj = userAccount?.socials?.find(
     (item) => item.social_type === 'google'
   )
 
   const embeddedWallet = userAccount?.wallets?.find(
-    (item) => item.wallet_client === 'impa'
+    (item) => item.wallet_client === 'embarky'
   )
 
   const isActive = (wallet) => {
     if (!wallet) return false
     const isConnectedWallet = wallet.wallet_address === address
-    const isImpaWallet = wallet.wallet_client === 'impa'
+    const isImpaWallet = wallet.wallet_client === 'embarky'
     return wallet.is_active && (isConnectedWallet || isImpaWallet)
   }
 
@@ -102,12 +100,15 @@ export default function Dashboard() {
 
     if (!activeWallet) return
 
-    if (activedWallet?.wallet_client === 'impa') {
+    if (activedWallet?.wallet_client === 'embarky') {
       setIsSignMessageOpen(true)
     } else {
       setSignStatus(SIGN_STATUS.SIGNING)
       try {
-        await signMessageAsync()
+        const message = await getSignMessage(address)
+        await signMessageAsync({
+          message,
+        })
         setSignStatus(SIGN_STATUS.SUCCESS)
       } catch (error) {
         setSignStatus(SIGN_STATUS.FAILED)
@@ -127,7 +128,7 @@ export default function Dashboard() {
   useEffect(() => {
     const canActiveList = (userAccount?.wallets || []).filter((item) => {
       const isConnectedWallet = item.wallet_address === address
-      const isImpaWallet = item.wallet_client === 'impa'
+      const isImpaWallet = item.wallet_client === 'embarky'
       return isConnectedWallet || isImpaWallet
     })
 
@@ -230,7 +231,7 @@ export default function Dashboard() {
           </Text>
           {userAccount?.wallets?.map((item) => {
             const isConnectedWallet = item.wallet_address === address
-            const isImpaWallet = item.wallet_client === 'impa'
+            const isImpaWallet = item.wallet_client === 'embarky'
             return (
               <Button
                 variant="outline"
@@ -286,7 +287,7 @@ export default function Dashboard() {
                         </Button>
                       ) : null}
 
-                      {item.wallet_client === 'impa' ? null : (
+                      {item.wallet_client === 'embarky' ? null : (
                         <Image
                           src={unlinkImg}
                           cursor={
