@@ -111,5 +111,6 @@ const modes = {
 export const getTheme = (_theme) =>
   extendTheme({
     useSystemColorMode: false,
+    initialColorMode: _theme,
     ...modes[_theme],
   })
