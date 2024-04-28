@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Button,
   Code,
@@ -8,12 +8,26 @@ import {
   VStack,
   useMediaQuery,
   useToast,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverBody,
+  PopoverCloseButton,
+  CircularProgress,
+  Portal,
 } from '@chakra-ui/react'
 import { useAccount, useDisconnect, useSignMessage } from 'wagmi'
-import { useEmbarky, getSignMessage } from '@embarky/react'
+import {
+  useEmbarky,
+  getSignMessage,
+  useFarcaster,
+  QRCode,
+} from '@embarky/react'
+
 import Image from '@/components/Image'
 import { formatAddress } from '@/utils'
 import googleImg from '@/images/social/google.svg'
+import twitterImg from '@/images/social/twitter.svg'
 import walletImg from '@/images/icon/wallet.svg'
 import socialImg from '@/images/icon/social.svg'
 import linkImg from '@/images/icon/link.svg'
@@ -38,10 +52,14 @@ export default function Dashboard() {
     linkWallet,
     unlinkWallet,
     linkGoogle,
+    linkTwitter,
+    unlinkTwitter,
     unlinkGoogle,
     activeWallet,
     connectWallet,
     exportWallet,
+    linkFarcaster,
+    unlinkFarcaster,
   } = useEmbarky()
   const { address, isConnected } = useAccount()
   const [isSignMessageOpen, setIsSignMessageOpen] = useState(false)
@@ -49,13 +67,27 @@ export default function Dashboard() {
   const [hoverWallet, setHoverWallet] = useState('')
   const { disconnectAsync } = useDisconnect()
   const toast = useToast()
-
+  const { data: farcasterData, onSignin, onSignout, qrCodeUrl } = useFarcaster()
   const [isLargerThan900] = useMediaQuery('(min-width: 900px)')
+
+  useEffect(() => {
+    if (farcasterData?.state === 'completed') {
+      // console.log('farcasterData?.status', farcasterData?.state)
+      onLinkFarcaster(farcasterData)
+    }
+  }, [farcasterData])
 
   const { isLoading: isSigning, signMessageAsync } = useSignMessage()
 
+  const [loadingFarcaster, setLoadingFarcaster] = useState(false)
   const googleObj = userAccount?.socials?.find(
     (item) => item.social_type === 'google'
+  )
+  const twitterObj = userAccount?.socials?.find(
+    (item) => item.social_type === 'twitter'
+  )
+  const farcasterObj = userAccount?.socials?.find(
+    (item) => item.social_type === 'warpcast'
   )
 
   const embeddedWallet = userAccount?.wallets?.find(
@@ -76,6 +108,7 @@ export default function Dashboard() {
     if (googleObj) {
       try {
         const res = await unlinkGoogle(googleObj.social_subject)
+        console.log('res', res)
       } catch (e) {
         toast({
           title: JSON.parse(e?.message)?.data,
@@ -84,10 +117,74 @@ export default function Dashboard() {
         })
       }
     } else {
-      linkGoogle()
+      try {
+        console.log('3232')
+        await linkGoogle()
+      } catch (e) {
+        toast({
+          title: JSON.parse(e?.message)?.data,
+          status: 'error',
+          position: 'top',
+        })
+      }
+    }
+  }
+  const onUnlineTwitter = async () => {
+    try {
+      const res = await unlinkTwitter(twitterObj.social_subject)
+      console.log('res', res)
+    } catch (e) {
+      toast({
+        title: JSON.parse(e?.message)?.data,
+        status: 'error',
+        position: 'top',
+      })
+    }
+  }
+  const onLinkTwitter = async () => {
+    try {
+      const res = await linkTwitter()
+      console.log('res', res)
+    } catch (e) {
+      console.log('e')
+      toast({
+        title: e?.message,
+        status: 'error',
+        position: 'top',
+      })
     }
   }
 
+  const onUnlinkFarcaster = async () => {
+    try {
+      const res = await unlinkFarcaster(farcasterObj.social_subject)
+      // console.log('onUnlinkFarcaster res', res)
+      onSignout()
+    } catch (e) {
+      toast({
+        title: JSON.parse(e?.message)?.data,
+        status: 'error',
+        position: 'top',
+      })
+    }
+  }
+  const onLinkFarcaster = async (data) => {
+    try {
+      // console.log('onUnlinkFarcaster', data)
+      setLoadingFarcaster(true)
+      const res = await linkFarcaster(data)
+      // console.log('res', res)
+    } catch (e) {
+      console.log('e')
+      toast({
+        title: e?.message,
+        status: 'error',
+        position: 'top',
+      })
+    } finally {
+      setLoadingFarcaster(false)
+    }
+  }
   const onUnlinkWallet = (wallet_address) => {
     if (unlinkWalletDisable) return
     unlinkWallet(wallet_address)
@@ -152,6 +249,7 @@ export default function Dashboard() {
       socials: userAccount?.socials,
     }
   }
+  const initRef = useRef()
 
   return (
     <Flex
@@ -176,6 +274,7 @@ export default function Dashboard() {
           color={'primary'}
           whiteSpace={'pre-wrap'}
           wordBreak={'break-all'}
+          bg="black"
         >
           {JSON.stringify(getDisplayData(), null, 2)}
         </Code>
@@ -401,8 +500,9 @@ export default function Dashboard() {
               </Text>
             </Flex>
             <Text fontSize={'12px'} color={'second'} mt={'8px'}>
-              A user's embedded wallet is theirs to keep, and even take with
-              them.
+              {
+                "A user's embedded wallet is theirs to keep, and even take with them."
+              }
             </Text>
             <Button
               fontSize={'14px'}
@@ -463,6 +563,159 @@ export default function Dashboard() {
               w={'16px'}
               h={'16px'}
             />
+          </Flex>
+        </Button>
+        <Button
+          variant="outline"
+          color="white"
+          mt={'8px'}
+          p="8px 16px"
+          height={'40px'}
+          borderWidth={'1px'}
+          borderRadius={'8px'}
+          w={'full'}
+        >
+          <Flex
+            w={'full'}
+            direction="row"
+            alignItems="center"
+            justifyContent="flex-start"
+            gap={'12px'}
+          >
+            <Image width={'16px'} height={'16px'} src={twitterImg} />
+            <Text fontSize={'14px'} mr="auto" color={'primary'}>
+              Twitter
+            </Text>
+
+            <Text fontSize={'12px'} color={'second'}>
+              {twitterObj?.social_username}
+            </Text>
+
+            <Image
+              src={twitterObj ? unlinkImg : linkImg}
+              cursor={'pointer'}
+              onClick={() => (twitterObj ? onUnlineTwitter() : onLinkTwitter())}
+              w={'16px'}
+              h={'16px'}
+            />
+          </Flex>
+        </Button>
+        <Button
+          variant="outline"
+          color="white"
+          mt={'8px'}
+          p="8px 16px"
+          height={'40px'}
+          borderWidth={'1px'}
+          borderRadius={'8px'}
+          w={'full'}
+        >
+          <Flex
+            w={'full'}
+            direction="row"
+            alignItems="center"
+            justifyContent="flex-start"
+            gap={'12px'}
+          >
+            <img
+              src="https://embarky-static-public.s3.ap-southeast-1.amazonaws.com/imgs/farcaster-logo.svg"
+              style={{
+                width: '16px',
+              }}
+            />
+            <Text fontSize={'14px'} mr="auto" color={'primary'}>
+              Farcaster
+            </Text>
+
+            <Text fontSize={'12px'} color={'second'}>
+              {farcasterObj?.social_username}
+            </Text>
+
+            {farcasterObj ? (
+              <Image
+                src={unlinkImg}
+                cursor={'pointer'}
+                onClick={onUnlinkFarcaster}
+                w={'16px'}
+                h={'16px'}
+              />
+            ) : (
+              <Popover
+                styleConfig={{
+                  width: '220px',
+                }}
+                closeOnBlur={false}
+                placement="bottom"
+                initialFocusRef={initRef}
+              >
+                <>
+                  <PopoverTrigger>
+                    <Image
+                      src={linkImg}
+                      cursor={'pointer'}
+                      onClick={() => {
+                        onSignin()
+                      }}
+                      w={'16px'}
+                      h={'16px'}
+                    />
+                  </PopoverTrigger>
+                  <Portal>
+                    <PopoverContent
+                      bg={'var(--chakra-colors-dark-bg)'}
+                      padding={'20px'}
+                      position={'relative'}
+                      borderRadius={8}
+                      border={'1px solid var(--chakra-colors-border)'}
+                    >
+                      <PopoverCloseButton
+                        position={'absolute'}
+                        top={'10px'}
+                        right={'10px'}
+                        cursor={'pointer'}
+                      />
+                      <PopoverBody
+                        padding={'20px 0'}
+                        display={'flex'}
+                        flexDirection={'column'}
+                        alignItems={'center'}
+                      >
+                        <div
+                          style={{
+                            position: 'relative',
+                          }}
+                        >
+                          {qrCodeUrl && (
+                            <QRCode
+                              uri={qrCodeUrl}
+                              size={180}
+                              logoSize={22}
+                              logoMargin={12}
+                            />
+                          )}
+                          {loadingFarcaster ? (
+                            <CircularProgress
+                              isIndeterminate
+                              value={50}
+                              color="brand"
+                              style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                              }}
+                            />
+                          ) : null}
+                        </div>
+                        <Box fontSize={14} mt="8px">
+                          {"Scan with your phone's camera to continue."}
+                        </Box>
+                      </PopoverBody>
+                    </PopoverContent>
+                  </Portal>
+                </>
+              </Popover>
+            )}
           </Flex>
         </Button>
       </Box>

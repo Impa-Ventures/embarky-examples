@@ -11,7 +11,7 @@ const nextConfig = {
   //   return [
   //     {
   //       source: '/ONBOARDING_API/:path*',
-  //       destination: 'http://13.212.200.64:8080/:path*',
+  //       destination: 'https://auth.embarky.xyz/:path*',
   //     },
   //   ]
   // },
