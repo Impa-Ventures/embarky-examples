@@ -6,6 +6,7 @@ const config = {
   theme: 'dark',
   defaultChain: bsc,
   supportedChains: [bsc, mainnet],
+  appLogo: '', // optional, size: 165px * 34px
   farcaster: {
     rpcUrl: 'https://optimism-rpc.publicnode.com',
     // domain: 'embarky.com',
