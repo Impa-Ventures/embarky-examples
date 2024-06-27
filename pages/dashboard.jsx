@@ -354,7 +354,7 @@ export default function Dashboard() {
                   }}
                 >
                   {/* <Image width={'16px'} height={'16px'} src={icon} /> */}
-                  <Text fontSize={'14px'} mr="auto" color={'primary'}>
+                  <Text fontSize={'14px'} mr="auto" color={'#000'}>
                     {formatAddress(item.wallet_address)}
                   </Text>
 
@@ -548,7 +548,7 @@ export default function Dashboard() {
             gap={'12px'}
           >
             <Image width={'16px'} height={'16px'} src={googleImg} />
-            <Text fontSize={'14px'} mr="auto" color={'primary'}>
+            <Text fontSize={'14px'} mr="auto" color={'#000'}>
               Google
             </Text>
 
@@ -583,7 +583,7 @@ export default function Dashboard() {
             gap={'12px'}
           >
             <Image width={'16px'} height={'16px'} src={twitterImg} />
-            <Text fontSize={'14px'} mr="auto" color={'primary'}>
+            <Text fontSize={'14px'} mr="auto" color={'#000'}>
               Twitter
             </Text>
 
@@ -623,7 +623,7 @@ export default function Dashboard() {
                 width: '16px',
               }}
             />
-            <Text fontSize={'14px'} mr="auto" color={'primary'}>
+            <Text fontSize={'14px'} mr="auto" color={'#000'}>
               Farcaster
             </Text>
 
