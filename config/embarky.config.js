@@ -6,7 +6,7 @@ const config = {
   theme: 'light',
   defaultChain: bsc,
   supportedChains: [bsc, mainnet],
-  appLogo: '', // optional, size: 165px * 34px
+  // appLogo: '', // optional, size: 165px * 34px
   allowMethods: ['farcaster', 'twitter', 'google'],
   allowWallets: ['metaMask', 'tomo'],
   farcaster: {
