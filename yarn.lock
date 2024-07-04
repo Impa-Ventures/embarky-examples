@@ -888,6 +888,17 @@
     preact "^10.16.0"
     sha.js "^2.4.11"
 
+"@embarky/core-sdk@0.0.2-8":
+  version "0.0.2-8"
+  resolved "https://registry.yarnpkg.com/@embarky/core-sdk/-/core-sdk-0.0.2-8.tgz#9828aedef531c003c2210dc4d98583dcab305a79"
+  integrity sha512-pSp1gWlX/lnGnOnpGM8LqHrC171Yvs+j17IwIkNoLEb0q2j9dUzklFB70kXNryq2B43ZUhapSrAQfuTVX0nbQQ==
+  dependencies:
+    axios "^1.6.7"
+    crypto-js "^4.2.0"
+    events "^3.3.0"
+    firebase "^10.7.2"
+    js-cookie "^3.0.5"
+
 "@embarky/core-sdk@^0.0.2-7":
   version "0.0.2-7"
   resolved "https://registry.yarnpkg.com/@embarky/core-sdk/-/core-sdk-0.0.2-7.tgz#d83756620ac8cdfc3f2372c22020f2f68dcf9f4a"
@@ -899,10 +910,10 @@
     firebase "^10.7.2"
     js-cookie "^3.0.5"
 
-"@embarky/react@^0.0.4-0":
-  version "0.0.4-0"
-  resolved "https://registry.yarnpkg.com/@embarky/react/-/react-0.0.4-0.tgz#a5f966a28200142a10dd1ed9a97e768a2bb8ad56"
-  integrity sha512-+11g6Swe9W4YePYWaPWGQCF6/2JOHDu4vkVB9PhxaeqFw3YxhteceAMWhEdgdAdJyFf4PyANINWqNW+8Vi1d/w==
+"@embarky/react@0.0.4-1":
+  version "0.0.4-1"
+  resolved "https://registry.yarnpkg.com/@embarky/react/-/react-0.0.4-1.tgz#2eeaff5613b8dd2ba0534378e2ea8f22fecb83d2"
+  integrity sha512-nQlwDOGQIkD15L0bkao6q5iAFxW8R8FkeSoOsf+HukL+UC1P3NuNZPvJoc8NY3D2z748fjYE8ZioU/c2ym9jsQ==
   dependencies:
     "@chakra-ui/media-query" "^3.3.0"
     "@chakra-ui/toast" "^7.0.2"

@@ -23,7 +23,7 @@ import {
   useFarcaster,
   QRCode,
 } from '@embarky/react'
-
+import { getMoonPayUrl } from '@embarky/core-sdk'
 import Image from '@/components/Image'
 import { formatAddress } from '@/utils'
 import googleImg from '@/images/social/google.svg'
@@ -552,7 +552,7 @@ export default function Dashboard() {
               Google
             </Text>
 
-            <Text fontSize={'12px'} color={'second'}>
+            <Text fontSize={'12px'} color={'#000'}>
               {googleObj?.social_username}
             </Text>
 
@@ -582,12 +582,19 @@ export default function Dashboard() {
             justifyContent="flex-start"
             gap={'12px'}
           >
-            <Image width={'16px'} height={'16px'} src={twitterImg} />
+            <Image
+              width={'16px'}
+              height={'16px'}
+              src={twitterImg}
+              style={{
+                filter: 'brightness(0.2)',
+              }}
+            />
             <Text fontSize={'14px'} mr="auto" color={'#000'}>
               Twitter
             </Text>
 
-            <Text fontSize={'12px'} color={'second'}>
+            <Text fontSize={'12px'} color={'#000'}>
               {twitterObj?.social_username}
             </Text>
 
@@ -627,7 +634,7 @@ export default function Dashboard() {
               Farcaster
             </Text>
 
-            <Text fontSize={'12px'} color={'second'}>
+            <Text fontSize={'12px'} color={'#000'}>
               {farcasterObj?.social_username}
             </Text>
 
@@ -718,6 +725,48 @@ export default function Dashboard() {
             )}
           </Flex>
         </Button>
+      </Box>
+      <Box
+        w={isLargerThan900 ? '288px' : 'full'}
+        p="16px"
+        bg={'dark.bg'}
+        borderRadius={'10px'}
+        color={'primary'}
+        alignSelf={'flex-start'}
+      >
+        <Text fontSize={'14px'}>Utils</Text>
+        <Box
+          height={'36px'}
+          width={'100%'}
+          display={'flex'}
+          justifyContent={'center'}
+          alignItems={'center'}
+          borderWidth={'1px'}
+          borderColor={'#767BFF'}
+          background={'#fff'}
+          color="#767BFF"
+          borderRadius={'10px'}
+          fontWeight={600}
+          mt="8px"
+          fontSize={'14px'}
+          cursor={'pointer'}
+          onClick={async () => {
+            const activedWallet = (userAccount?.wallets || []).find((item) =>
+              isActive(item)
+            )
+            const url = await getMoonPayUrl({
+              wallet_address: activedWallet.wallet_address,
+              currency_code: 'eth',
+              redirect_url: 'https://demo.embarky.xyz',
+            })
+            console.log('url', url)
+            if (url) {
+              window.open(url)
+            }
+          }}
+        >
+          Moon Pay
+        </Box>
       </Box>
 
       {isSignMessageOpen ? (
