@@ -8,7 +8,7 @@ const config = {
   supportedChains: [bsc, mainnet],
   // appLogo: '', // optional, size: 165px * 34px
   allowMethods: ['farcaster', 'twitter', 'google'],
-  allowWallets: ['metaMask', 'tomo'],
+  // allowWallets: ['metaMask', 'tomo'],
   farcaster: {
     rpcUrl: 'https://optimism-rpc.publicnode.com',
     // domain: 'embarky.com',
