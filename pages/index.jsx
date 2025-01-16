@@ -440,9 +440,10 @@ export default function Home() {
           <DrawerOverlay />
           <DrawerContent background={'none'}>
             <LoginModal
+              appLogo={logoUrl || undefined}
               theme={embarkyConfig.theme}
-              allowMethods={embarkyConfig.allowMethods}
-              allowWallets={embarkyConfig.allowWallets}
+              allowMethods={selectedSocialMethods}
+              allowWallets={wallets}
               onClose={() => {
                 setShowDrawer(false)
               }}
