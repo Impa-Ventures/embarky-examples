@@ -85,7 +85,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (farcasterData?.state === 'completed') {
-      // console.log('farcasterData?.status', farcasterData?.state)
       onLinkFarcaster(farcasterData)
     }
   }, [farcasterData])
@@ -114,7 +113,6 @@ export default function Dashboard() {
 
   const unlinkWalletDisable = userAccount?.wallets?.length === 1
 
-  // jacky: add try catch to handle unlink google error
   const onGoogle = async () => {
     if (googleObj) {
       try {
@@ -130,7 +128,6 @@ export default function Dashboard() {
     } else {
       try {
         linkGoogleRedirect()
-        // await linkGoogle()
       } catch (e) {
         toast({
           title: JSON.parse(e?.message)?.data,
@@ -155,9 +152,6 @@ export default function Dashboard() {
   const onLinkTwitter = async () => {
     try {
       linkTwitterRedirect()
-
-      // const res = await linkTwitter()
-      // console.log('res', res)
     } catch (e) {
       console.log('e')
       toast({
@@ -171,7 +165,6 @@ export default function Dashboard() {
   const onUnlinkFarcaster = async () => {
     try {
       const res = await unlinkFarcaster(farcasterObj.social_subject)
-      // console.log('onUnlinkFarcaster res', res)
       onSignout()
     } catch (e) {
       toast({
@@ -183,10 +176,8 @@ export default function Dashboard() {
   }
   const onLinkFarcaster = async (data) => {
     try {
-      // console.log('onUnlinkFarcaster', data)
       setLoadingFarcaster(true)
-      const res = await linkFarcaster(data)
-      // console.log('res', res)
+      await linkFarcaster(data)
     } catch (e) {
       console.log('e')
       toast({
@@ -347,11 +338,12 @@ export default function Dashboard() {
           <Text fontSize={'12px'} color={'second'} mt={'8px'}>
             Connect and link wallets to your account.
           </Text>
-          {userAccount?.wallets?.map((item) => {
+          {userAccount?.wallets?.map((item,i) => {
             const isConnectedWallet = item.wallet_address === address
             const isImpaWallet = item.wallet_client === 'embarky'
             return (
               <Button
+                key={i}
                 variant="outline"
                 color="white"
                 mt={'8px'}

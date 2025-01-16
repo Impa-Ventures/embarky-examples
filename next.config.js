@@ -7,14 +7,6 @@ const nextConfig = {
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-  // async rewrites() {
-  //   return [
-  //     {
-  //       source: '/ONBOARDING_API/:path*',
-  //       destination: 'https://auth.embarky.xyz/:path*',
-  //     },
-  //   ]
-  // },
 }
 
 module.exports = nextConfig

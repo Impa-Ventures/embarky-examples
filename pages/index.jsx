@@ -23,8 +23,6 @@ import {
   IconFarcaster,
   Icontwitter,
   IconSolana,
-  // IconAptos,
-  // IconEVM,
 } from '@/images/index'
 import iconEdit from '@/images/icon/edit.svg'
 import iconSocial from '@/images/icon/social.svg'
@@ -199,7 +197,6 @@ export default function Home() {
               Authentication
             </Flex>
             <Flex
-              // borderBottom={'1px solid #ddd'}
               justifyContent={'space-between'}
               alignItems={'center'}
               height="40px"

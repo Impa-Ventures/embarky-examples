@@ -29,10 +29,12 @@ export function Sponsor() {
   const [transactionToSubmit, setTransactionToSubmit] =
     useState<AnyRawTransaction | null>(null)
 
-  const [senderAuthenticator, setSenderAuthenticator] =
-    useState<AccountAuthenticator>()
-  const [feepayerAuthenticator, setFeepayerAuthenticator] =
-    useState<AccountAuthenticator>()
+  const [senderAuthenticator, setSenderAuthenticator] = useState<
+    AccountAuthenticator | undefined
+  >()
+  const [feepayerAuthenticator, setFeepayerAuthenticator] = useState<
+    AccountAuthenticator | undefined
+  >()
 
   const sendable = isSendableNetwork(!!account?.address, network?.name)
 
@@ -44,7 +46,7 @@ export function Sponsor() {
       data: {
         function: '0x1::coin::transfer',
         typeArguments: [APTOS_COIN],
-        functionArguments: [account?.address, 1], // 1 is in Octas
+        functionArguments: [account?.address, 1],
       },
     })
     if (transaction) {
@@ -64,7 +66,6 @@ export function Sponsor() {
       throw new Error('No Transaction to sign')
     }
     try {
-      // create sponsor account
       const SPONSOR_INITIAL_BALANCE = 100_000_000
       const sponsor = Account.generate()
 

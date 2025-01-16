@@ -1,6 +1,7 @@
 import { Button, useToast, Flex } from '@chakra-ui/react'
 import { useSolana } from '@embarky/react'
 import bs58 from 'bs58'
+import type { SolanaSignInInput } from '@solana/wallet-standard-features'
 import {
   PublicKey,
   Transaction,
@@ -9,12 +10,9 @@ import {
   VersionedTransaction,
   LAMPORTS_PER_SOL,
 } from '@solana/web3.js'
-import type { SolanaSignInInput } from '@solana/wallet-standard-features'
-// import { useAccount } from 'wagmi' // eslint-disable-line
 
 export default function SolanaTx() {
   const toast = useToast({ position: 'bottom-right', duration: 3000 })
-  // const { address: wagmiAddress } = useAccount()
   const {
     wallet,
     wallets,
@@ -27,7 +25,6 @@ export default function SolanaTx() {
     signIn,
   } = useSolana()
   const supportedTransactionVersions = wallet?.supportedTransactionVersions
-  console.log('signIn', signIn)
   async function onSendTransation() {
     const {
       context: { slot: minContextSlot },
@@ -54,15 +51,6 @@ export default function SolanaTx() {
         signature,
       })
 
-      console.log('confirmTransaction', res)
-      // res ={
-      //   context: {
-      //     slot:324816692
-      //   }
-      //   value: {
-      //     err: null
-      //   }
-      // }
       toast({
         title: 'success',
         description: <span>Transaction successful!</span>,
@@ -72,16 +60,11 @@ export default function SolanaTx() {
 
   async function onSignMessage() {
     const message = 'Hello2'
-    const messageBuffer = Buffer.from(message) // the same with new TextEncoder().encode(message)
+    const messageBuffer = Buffer.from(message)
 
     const signature = await signMessage?.(messageBuffer)
 
     if (signature) {
-      // console.log(
-      //   'bs58.encode(signature)22',
-      //   bs58.encode(signature),
-      //   Buffer.from(signature).toString('hex')
-      // )
       toast({
         title: 'Signature successfully',
         description: bs58.encode(signature),
@@ -137,11 +120,6 @@ export default function SolanaTx() {
       if (!supportedTransactionVersions.has(0))
         throw new Error("Wallet doesn't support v0 transactions!")
 
-      /**
-       * This lookup table only exists on devnet and can be replaced as
-       * needed.  To create and manage a lookup table, use the `solana
-       * address-lookup-table` commands.
-       */
       const { value: lookupTable } = await connection.getAddressLookupTable(
         new PublicKey('F3MfgEJe1TApJiA14nN2m4uAH4EBVrqdBnHeGeSXvQ7B')
       )
@@ -299,7 +277,6 @@ export default function SolanaTx() {
   return (
     <div>
       <div>Address:{address}</div>
-      {/* <div>wagmiAddress:{wagmiAddress}</div> */}
       <div>publicKey:{publicKey?.toString()}</div>
       <Flex flexWrap={'wrap'} gap="20px" marginTop={'20px'}>
         <Button onClick={() => onSignMessage()}>signMessage</Button>

@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useMemo, useState } from 'react'
 
-type AllowNetworks = 'evm' | 'aptos' | 'solana'
-type AllowMethods = 'google' | 'twitter' | 'farcaster'
+export type AllowNetworks = 'evm' | 'aptos' | 'solana'
+export type AllowMethods = 'google' | 'twitter' | 'farcaster'
 const ConfigContext = createContext<{
   selectedwalletNetworks: AllowNetworks[]
   selectedSocialMethods: AllowMethods[]

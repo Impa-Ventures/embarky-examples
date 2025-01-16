@@ -4,7 +4,7 @@ import { Flex, Box, Button, useToast } from '@chakra-ui/react'
 // @ts-ignore
 import { useAccount } from 'wagmi'
 // @ts-ignore
-import { parseTypeTag, AccountAddress, U64, Account } from '@aptos-labs/ts-sdk' // eslint-disable-line
+import { Account } from '@aptos-labs/ts-sdk' // eslint-disable-line
 
 import { TransactionHash } from './TransactionHash'
 import { Sponsor } from './Sponsor'
@@ -26,7 +26,6 @@ export default function AptosTx() {
     generateMultiAgentTransaction,
   } = useAptos()
   const { address } = useAccount()
-  // const { disconnectAsync } = useDisconnect()
   const toast = useToast({
     position: 'bottom-right',
     duration: 3000,
@@ -72,7 +71,7 @@ export default function AptosTx() {
       data: {
         function: '0x1::coin::transfer',
         typeArguments: [APTOS_COIN],
-        functionArguments: [address, 1], // 1 is in Octas
+        functionArguments: [address, 1],
       },
     }
     try {
@@ -90,40 +89,13 @@ export default function AptosTx() {
     }
   }, [address, aptosClient])
 
-  // const onSignAndSubmitBCSTransaction = async () => {
-  //   if (!address) return
-  //   const transaction = generateTransaction({
-  //     data: {
-  //       function: '0x1::coin::transfer',
-  //       typeArguments: [parseTypeTag(APTOS_COIN)],
-  //       functionArguments: [AccountAddress.from(address), new U64(1)], // 1 is in Octas
-  //     },
-  //   })
-  //   try {
-  //     const response = await signAndSubmitTransaction({
-  //       transaction,
-  //     })
-  //     const res = await aptosClient.waitForTransaction({
-  //       transactionHash: response.hash,
-  //     })
-  //     console.log('res', res)
-  //     toast({
-  //       title: 'Success',
-  //       description: <TransactionHash hash={response.hash} network={network} />,
-  //     })
-  //   } catch (error) {
-  //     console.error(error)
-  //   }
-  // }
-
-  // Legacy typescript sdk support
   const onSignTransaction = async () => {
     try {
       const payload = {
         type: 'entry_function_payload',
         function: '0x1::coin::transfer',
         type_arguments: ['0x1::aptos_coin::AptosCoin'],
-        arguments: [address, 1], // 1 is in Octas
+        arguments: [address, 1],
       }
       const response = await signTransaction(payload)
       toast({
@@ -144,7 +116,7 @@ export default function AptosTx() {
         data: {
           function: '0x1::coin::transfer',
           typeArguments: [APTOS_COIN],
-          functionArguments: [address, 1], // 1 is in Octas
+          functionArguments: [address, 1],
         },
       })
       // @ts-ignore
@@ -165,7 +137,7 @@ export default function AptosTx() {
     const tx = await aptosClient
       ?.fundAccount({
         accountAddress: secondarySigner.accountAddress.toString(),
-        amount: 100_000_000,
+        amount: 100000000,
         options: { waitForIndexer: false },
       })
       .catch((e) => console.log('ee', e))
@@ -178,7 +150,7 @@ export default function AptosTx() {
       data: {
         function: '0x1::coin::transfer',
         typeArguments: [APTOS_COIN],
-        functionArguments: [account?.address, 1], // 1 is in Octas
+        functionArguments: [account?.address, 1],
       },
     })
     // @ts-ignore
@@ -238,27 +210,8 @@ export default function AptosTx() {
   return (
     <>
       <Box>
-        {/* <Box>address: {address}</Box> */}
         <Box>account.address: {account?.address}</Box>
         <Box>publick key: {account?.publicKey}</Box>
-        {/* <Button
-          onClick={async () => {
-            await disconnectAsync().catch((e) => console.log('e', e))
-            logout()
-          }}
-        >
-          logout
-        </Button> */}
-        {/* <Box>chainId: {chainId}</Box> */}
-        {/* <Box>chain.id: {chain?.id}</Box> */}
-        {/* <Input
-      placeholder="enter message to be signed"
-      value={message1}
-      onChange={(e) => setMessaage1(e.target.value)}
-    />
-    <Box maxW={'600px'}>
-      signature: {signature ? JSON.stringify(signature) : '-'}
-    </Box> */}
         <Box>netWork: {network ? JSON.stringify(network) : '-'}</Box>
       </Box>
       <Box width={'672px'}>
@@ -267,9 +220,6 @@ export default function AptosTx() {
           <Button onClick={onSignAndSubmitTransaction} isDisabled={!sendable}>
             Sign and submit transaction
           </Button>
-          {/* <Button onClick={onSignAndSubmitBCSTransaction} isDisabled={!sendable}>
-            Sign and submit BCS transaction
-          </Button> */}
           <Button onClick={onSignTransaction} isDisabled={!sendable}>
             Sign transaction
           </Button>
@@ -283,66 +233,8 @@ export default function AptosTx() {
             Sign message and verify
           </Button>
         </Flex>
-        {/* <Box marginTop={'16px'}>MuilAgent Transcation</Box>
-        <Flex gap="16px" flexWrap={'wrap'} marginTop={'16px'}>
-          <Button onClick={onSenderSignTransaction} isDisabled={!sendable}>
-            Sign as sender
-          </Button>
-          <Button
-            onClick={onSecondarySignerSignTransaction}
-            isDisabled={!sendable || !senderAuthenticator}
-          >
-            Sign as secondary signer
-          </Button>
-          <Button
-            onClick={onSubmitTransaction}
-            isDisabled={!sendable || !secondarySignerAuthenticator}
-          >
-            Submit transaction
-          </Button>
-          {secondarySignerAccount && senderAuthenticator && (
-            <div className="flex flex-col gap-6">
-              <h4 className="text-lg font-medium">Secondary Signer details</h4>
-              <ul>
-                {[
-                  {
-                    label: 'Private Key',
-                    value: secondarySignerAccount?.privateKey.toString(),
-                  },
-                  {
-                    label: 'Public Key',
-                    value: secondarySignerAccount?.publicKey.toString(),
-                  },
-                  {
-                    label: 'Address',
-                    value: secondarySignerAccount?.accountAddress.toString(),
-                  },
-                ].map((item) => {
-                  return (
-                    <li>
-                      {item.label}: {item.value}
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
-          )}
-        </Flex> */}
         <Sponsor />
       </Box>
-      {/* <Code
-        as="pre"
-        padding={'16px'}
-        borderRadius={'10px'}
-        h={'calc(100vh - 246px)'}
-        overflowY={'scroll'}
-        fontSize={'12px'}
-        color={'primary'}
-        whiteSpace={'pre-wrap'}
-        wordBreak={'break-all'}
-      >
-        {JSON.stringify(userAccount, null, 2)}
-      </Code> */}
     </>
   )
 }

@@ -1,4 +1,3 @@
-// 'use client'
 import React from 'react'
 import {
   Box,
@@ -29,7 +28,6 @@ export default function SignMessageModal({ onClose, onSuccess, onFailed }) {
       await wallet.signMessage({
         message,
       })
-      // console.log('signMessage:res---', res)
       onSuccess()
     } catch (error) {
       onFailed()
