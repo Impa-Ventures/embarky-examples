@@ -361,6 +361,7 @@ export default function Home() {
             <>
               <Box paddingTop={'32px'}>
                 <LoginModal
+                  appLogo={logoUrl || undefined}
                   theme={embarkyConfig.theme}
                   allowMethods={selectedSocialMethods}
                   allowWallets={wallets}
