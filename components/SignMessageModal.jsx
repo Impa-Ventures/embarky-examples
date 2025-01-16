@@ -1,5 +1,5 @@
-'use client'
-import React, { useState, useCallback } from 'react'
+// 'use client'
+import React from 'react'
 import {
   Box,
   Text,
@@ -23,12 +23,13 @@ export default function SignMessageModal({ onClose, onSuccess, onFailed }) {
 
   const signMessage = async () => {
     try {
+      onClose()
       const wallet = await getEmbeddedWallet()
       const message = await getSignMessage(walletObj.wallet_address)
-      const res = await wallet.signMessage({
+      await wallet.signMessage({
         message,
       })
-      console.log('signMessage:res---', res)
+      // console.log('signMessage:res---', res)
       onSuccess()
     } catch (error) {
       onFailed()

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
-import { Flex, Text, Box } from '@chakra-ui/react'
+import React, { useEffect } from 'react'
+import { Flex, Box } from '@chakra-ui/react'
 import { useEmbarky } from '@embarky/react'
-import { useRouter, useParams } from 'next/navigation'
-import Image from '@/components/Image'
-import Logo from '/public/logo.svg'
+import { useRouter } from 'next/navigation'
+import { logoDark } from '@/utils'
+import { ConfigProvider } from './ConfigProvider'
 
 export default function Layout({ children }) {
   const router = useRouter()
@@ -17,13 +17,9 @@ export default function Layout({ children }) {
     }
   }, [authenticated, router])
 
-  if (!authenticated) {
-    return <main>{children}</main>
-  }
-
   return (
     <main>
-      <Box minH={'100vh'} bg={'dark.bg'}>
+      <Box h={'100vh'} bg={'dark.bg'} overflow={'hidden'}>
         <Flex
           alignItems={'center'}
           fontWeight={500}
@@ -31,7 +27,13 @@ export default function Layout({ children }) {
           h={'68px'}
           bg={'dark.bg'}
         >
-          <Image src={Logo} height={20} mr={'6px'} />
+          <img
+            src={logoDark}
+            style={{
+              height: '32px',
+              marginRight: '6px',
+            }}
+          />
           <Flex
             fontSize={'xs'}
             ml={'6px'}
@@ -56,7 +58,7 @@ export default function Layout({ children }) {
             overflowY={'scroll'}
             bg={'dark.grayBg'}
           >
-            {children}
+            <ConfigProvider>{children}</ConfigProvider>
           </Box>
         </Box>
       </Box>

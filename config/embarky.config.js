@@ -2,17 +2,23 @@ import { bsc, mainnet } from 'viem/chains'
 
 const config = {
   appId: 'be78b498915f03b98bec',
-  Origin: 'https://demo.embarky.xyz',
-  theme: 'light',
-  defaultChain: bsc,
+  theme: 'dark',
+  appName: 'Embarky Demo',
   supportedChains: [bsc, mainnet],
-  // appLogo: '', // optional, size: 165px * 34px
+  defaultChain: bsc,
   allowMethods: ['farcaster', 'twitter', 'google'],
-  // allowWallets: ['metaMask', 'tomo'],
+  allowWallets: [
+    'Sui Wallet',
+    'Suiet',
+    'metaMask',
+    'tomo',
+    'coinbase',
+    'aptos-petra',
+    'aptos-nightly',
+    'solana-phantom',
+  ],
   farcaster: {
     rpcUrl: 'https://optimism-rpc.publicnode.com',
-    // domain: 'embarky.com',
-    // siweUri: 'https://embarky.com/login',
   },
 }
 

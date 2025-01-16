@@ -15,13 +15,20 @@ import {
   PopoverCloseButton,
   CircularProgress,
   Portal,
+  Modal,
+  ModalCloseButton,
+  ModalOverlay,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
 } from '@chakra-ui/react'
-import { useAccount, useDisconnect, useSignMessage } from 'wagmi'
+import { useAccount, useDisconnect, useSignMessage } from 'wagmi' // eslint-disable-line
 import {
   useEmbarky,
   getSignMessage,
   useFarcaster,
   QRCode,
+  useEmbarkySignMessage,
 } from '@embarky/react'
 import { getMoonPayUrl } from '@embarky/core-sdk'
 import Image from '@/components/Image'
@@ -36,6 +43,9 @@ import actionImg from '@/images/icon/action.svg'
 import lockImg from '@/images/icon/lock.svg'
 import editImg from '@/images/icon/edit.svg'
 import SignMessageModal from '@/components/SignMessageModal'
+import { getWalletIcon } from '@/images/index'
+import AptosTx from '@/components/aptosTx'
+import SolanaTx from '@/components/SolanaTx'
 
 const SIGN_STATUS = {
   INIT: 0,
@@ -60,8 +70,10 @@ export default function Dashboard() {
     exportWallet,
     linkFarcaster,
     unlinkFarcaster,
+    linkGoogleRedirect,
+    linkTwitterRedirect,
   } = useEmbarky()
-  const { address, isConnected } = useAccount()
+  const { address, connector } = useAccount()
   const [isSignMessageOpen, setIsSignMessageOpen] = useState(false)
   const [signStatus, setSignStatus] = useState(SIGN_STATUS.INIT)
   const [hoverWallet, setHoverWallet] = useState('')
@@ -69,6 +81,7 @@ export default function Dashboard() {
   const toast = useToast()
   const { data: farcasterData, onSignin, onSignout, qrCodeUrl } = useFarcaster()
   const [isLargerThan900] = useMediaQuery('(min-width: 900px)')
+  const { signMessage } = useEmbarkySignMessage()
 
   useEffect(() => {
     if (farcasterData?.state === 'completed') {
@@ -76,8 +89,6 @@ export default function Dashboard() {
       onLinkFarcaster(farcasterData)
     }
   }, [farcasterData])
-
-  const { isLoading: isSigning, signMessageAsync } = useSignMessage()
 
   const [loadingFarcaster, setLoadingFarcaster] = useState(false)
   const googleObj = userAccount?.socials?.find(
@@ -118,8 +129,8 @@ export default function Dashboard() {
       }
     } else {
       try {
-        console.log('3232')
-        await linkGoogle()
+        linkGoogleRedirect()
+        // await linkGoogle()
       } catch (e) {
         toast({
           title: JSON.parse(e?.message)?.data,
@@ -143,8 +154,10 @@ export default function Dashboard() {
   }
   const onLinkTwitter = async () => {
     try {
-      const res = await linkTwitter()
-      console.log('res', res)
+      linkTwitterRedirect()
+
+      // const res = await linkTwitter()
+      // console.log('res', res)
     } catch (e) {
       console.log('e')
       toast({
@@ -203,10 +216,12 @@ export default function Dashboard() {
       setSignStatus(SIGN_STATUS.SIGNING)
       try {
         const message = await getSignMessage(address)
-        await signMessageAsync({
-          message,
-        })
-        setSignStatus(SIGN_STATUS.SUCCESS)
+        const res = await signMessage(message)
+        if (res) {
+          setSignStatus(SIGN_STATUS.SUCCESS)
+        } else {
+          setSignStatus(SIGN_STATUS.FAILED)
+        }
       } catch (error) {
         setSignStatus(SIGN_STATUS.FAILED)
       }
@@ -238,7 +253,7 @@ export default function Dashboard() {
   }, [userAccount, address, activeWallet])
 
   const onLogout = async () => {
-    await disconnectAsync()
+    await disconnectAsync().catch(() => console.log('e'))
     logout()
   }
 
@@ -250,6 +265,9 @@ export default function Dashboard() {
     }
   }
   const initRef = useRef()
+
+  const [isOpenSolanaTxModal, setOpenSolanaTxModal] = useState(false)
+  const [isOpenAptosModal, setOpenAptosModal] = useState(false)
 
   return (
     <Flex
@@ -274,7 +292,7 @@ export default function Dashboard() {
           color={'primary'}
           whiteSpace={'pre-wrap'}
           wordBreak={'break-all'}
-          bg="black"
+          bg={'dark.bg'}
         >
           {JSON.stringify(getDisplayData(), null, 2)}
         </Code>
@@ -284,6 +302,7 @@ export default function Dashboard() {
           borderWidth={'1px'}
           borderRadius={'10px'}
           w={'full'}
+          bg={'dark.bg'}
         >
           <Text fontSize={'14px'} color={'second'}>
             Sign out or delete your data to restart the demo.
@@ -353,8 +372,15 @@ export default function Dashboard() {
                     setHoverWallet('')
                   }}
                 >
-                  {/* <Image width={'16px'} height={'16px'} src={icon} /> */}
-                  <Text fontSize={'14px'} mr="auto" color={'#000'}>
+                  <img
+                    alt=""
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                    }}
+                    src={getWalletIcon(item.wallet_client)}
+                  />
+                  <Text fontSize={'14px'} mr="auto" color={'primary'}>
                     {formatAddress(item.wallet_address)}
                   </Text>
 
@@ -548,11 +574,11 @@ export default function Dashboard() {
             gap={'12px'}
           >
             <Image width={'16px'} height={'16px'} src={googleImg} />
-            <Text fontSize={'14px'} mr="auto" color={'#000'}>
+            <Text fontSize={'14px'} mr="auto" color={'primary'}>
               Google
             </Text>
 
-            <Text fontSize={'12px'} color={'#000'}>
+            <Text fontSize={'12px'} color={'primary'}>
               {googleObj?.social_username}
             </Text>
 
@@ -590,11 +616,11 @@ export default function Dashboard() {
                 filter: 'brightness(0.2)',
               }}
             />
-            <Text fontSize={'14px'} mr="auto" color={'#000'}>
+            <Text fontSize={'14px'} mr="auto" color={'primary'}>
               Twitter
             </Text>
 
-            <Text fontSize={'12px'} color={'#000'}>
+            <Text fontSize={'12px'} color={'primary'}>
               {twitterObj?.social_username}
             </Text>
 
@@ -630,11 +656,11 @@ export default function Dashboard() {
                 width: '16px',
               }}
             />
-            <Text fontSize={'14px'} mr="auto" color={'#000'}>
+            <Text fontSize={'14px'} mr="auto" color={'primary'}>
               Farcaster
             </Text>
 
-            <Text fontSize={'12px'} color={'#000'}>
+            <Text fontSize={'12px'} color={'primary'}>
               {farcasterObj?.social_username}
             </Text>
 
@@ -743,8 +769,7 @@ export default function Dashboard() {
           alignItems={'center'}
           borderWidth={'1px'}
           borderColor={'#767BFF'}
-          background={'#fff'}
-          color="#767BFF"
+          color="primary"
           borderRadius={'10px'}
           fontWeight={600}
           mt="8px"
@@ -767,8 +792,91 @@ export default function Dashboard() {
         >
           Moon Pay
         </Box>
+        {connector?.type.includes('solana') ? (
+          <Box
+            height={'36px'}
+            width={'100%'}
+            display={'flex'}
+            justifyContent={'center'}
+            alignItems={'center'}
+            borderWidth={'1px'}
+            borderColor={'border'}
+            background={'#fff'}
+            color="white"
+            bg="brand"
+            borderRadius={'10px'}
+            fontWeight={500}
+            mt="8px"
+            fontSize={'14px'}
+            cursor={'pointer'}
+            onClick={() => {
+              setOpenSolanaTxModal(true)
+            }}
+          >
+            Solana hooks
+          </Box>
+        ) : null}
+        {connector?.type.includes('aptos') ? (
+          <Box
+            height={'36px'}
+            width={'100%'}
+            display={'flex'}
+            justifyContent={'center'}
+            alignItems={'center'}
+            borderWidth={'1px'}
+            borderColor={'border'}
+            background={'#fff'}
+            color="white"
+            bg="brand"
+            borderRadius={'10px'}
+            fontWeight={500}
+            mt="8px"
+            fontSize={'14px'}
+            cursor={'pointer'}
+            onClick={() => {
+              setOpenAptosModal(true)
+            }}
+          >
+            Aptos hooks
+          </Box>
+        ) : null}
       </Box>
-
+      <Modal
+        size={'3xl'}
+        isOpen={isOpenSolanaTxModal}
+        onClose={() => {
+          setOpenSolanaTxModal(false)
+        }}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader color={'#000'}>
+            Solana Hooks
+            <ModalCloseButton />
+          </ModalHeader>
+          <ModalBody color="#000">
+            <SolanaTx />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={isOpenAptosModal}
+        onClose={() => {
+          setOpenAptosModal(false)
+        }}
+        size={'3xl'}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader color={'#000'}>
+            Aptos Hooks
+            <ModalCloseButton />
+          </ModalHeader>
+          <ModalBody color="#000">
+            <AptosTx />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
       {isSignMessageOpen ? (
         <SignMessageModal
           onClose={() => setIsSignMessageOpen(false)}
